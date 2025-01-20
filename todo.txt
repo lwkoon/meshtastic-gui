@@ -1,0 +1,28 @@
+git clone https://github.com/meshtastic/firmware.git
+cd firmware
+
+# See which tags are available
+git ls-remote --tags origin
+
+# I am going to pick 2.2.18 because that's the current beta
+git checkout refs/tags/v2.2.18.e9bde80
+
+git switch tft-gui-work
+git submodule update --init
+
+# Fix problems
+mkdir src/mesh/comms
+cp lib/device-ui/include/PacketServer.h src/mesh/comms/
+cp lib/device-ui/include/PacketClient.h src/mesh/comms/
+cp lib/device-ui/include/DeviceScreen.h src/graphics
+
+# Remove line 4 '#include "DisplayDriverConfig.h"' from src/graphics/DeviceScreen.h
+
+# Edit line 493 of ./lib/device-ui/source/ViewController.cpp
+# Change:
+# bytes[232], bytes[233], bytes[234], bytes[235], bytes[236]}},
+# to
+# bytes[232]}},
+
+# Finally, build it
+pio run -e t-deck-tft
